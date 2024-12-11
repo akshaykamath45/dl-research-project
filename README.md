@@ -11,18 +11,21 @@ This project aims to classify bird species using deep learning techniques. Our d
 ### Models Currently in Progress
 3. **Custom CNN - Akshay**
 4. **YOLO - Sridhar Sir**
+5. **Xception - Kartikey**
 
 ### Remaining Models to Implement
 5. EfficientNet B0 - Akshay
 6. ResNet 50 - Sridhar Sir
-7. Transformer Models (Swine)
+7. Transformer Models (Swine) 
 8. VGG19
-9. Xception
 
 If any issues, we can try extra
 
 10. CNN without Augmentation
 11. VGG16 without Augmentation
+
+## Results Update  
+After training the model, update the results in [this Google Doc](https://docs.google.com/document/d/1IUdKqsk9g5wEijbWiCzT49-3nQKj0M20Q0oy7t6vYPU/edit?tab=t.0).
 
 
 ---
