@@ -14,10 +14,10 @@ This project aims to classify bird species using deep learning techniques. Our d
 5. **Xception - Kartikey**
 
 ### Remaining Models to Implement
-5. EfficientNet B0 - Akshay
-6. ResNet 50 - Sridhar Sir
-7. Transformer Models (Swine) 
-8. VGG19
+6. EfficientNet B0 - Akshay
+7. ResNet 50 - Sridhar Sir
+8. Transformer Models (Swine) 
+9. VGG19
 
 If any issues, we can try extra
 
