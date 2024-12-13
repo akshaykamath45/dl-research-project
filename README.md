@@ -12,12 +12,11 @@ This project aims to classify bird species using deep learning techniques. Our d
 
 ### Models Currently in Progress
 5. **Custom CNN - Akshay**
-6. **YOLO - Sridhar Sir**
+6. **ResNet 50 - Sridhar Sir**
 
 ### Remaining Models to Implement
-7. ResNet 50 - Sridhar Sir
-8. Transformer Models (Swine) 
-9. VGG19
+7. Transformer Model (Swine)
+8. VGG19 - Sridhar Sir
 
 If any issues, we can try extra
 
@@ -51,21 +50,34 @@ After training the model, update the results in [this Google Doc](https://docs.g
 
 ---
 
-## 📊 Comparison Table
-| Sr. No | Model Name    | Parameters | Input Size  | Training Time      | Data Augmentation Techniques                                                  |
-|--------|---------------|------------|-------------|--------------------|-------------------------------------------------------------------------------|
-| 1      | VGG16         | ~15.9M     | 224 x 224   | ~9 hours (10 epochs, 720s/epoch) | Rotation, width/height shift, horizontal flip, zoom, shear, brightness        |
-| 2      | Inception V3  | ~23.9M     | 299 x 299   | ~4 hours (25 epochs) | Rotation, zoom, brightness, shear, flips                                     |
-| 3      | Custom CNN    | ~14.5M     | 256 x 256   | In Progress        | Rotation, width/height shifts, shear, zoom, horizontal flip, brightness       |
+## ⬛ Comparison Table
+
+| Sr. No | Model Name          | Number of Parameters | Input Size  | Training Time              | Data Augmentation Technique Used                                                                 |
+|--------|---------------------|-----------------------|-------------|----------------------------|-------------------------------------------------------------------------------------------------|
+| 1      | VGG16              | ~15.9M               | 224 x 224   | ~9 hours (10 epochs, 720s/epoch) | Rotation, width/height shift, horizontal flip, zoom, shear, brightness adjustment                |
+| 2      | Inception V3       | ~23.9M               | 299 x 299   | ~4 hours (25 epochs)       | Rotation, zoom, brightness, shear, flips                                                       |
+| 3      | Xception           | ~22.9M               | 224 x 224   | ~4 hours (50 epochs)       | Rotation (20°), width & height shift (0.2), horizontal flip                                   |
+| 4      | EfficientNet B0    | ~5.3M                | 299 x 299   | ~3.6 hours (10 epochs)     | Rescale, rotation range (20°), width shift (0.3), height shift (0.3), horizontal flip, vertical flip, zoom range (0.3), shear range (0.3), brightness range ([0.8, 1.2]), fill mode ('nearest') |
+| 5      | Custom CNN         | ~14.5M               | 256 x 256   |                            | Rotation, width and height shifts, shear, zoom, horizontal flip, brightness adjustment, and nearest neighbor fill mode |
+| 6      | ResNet 50          |                       |             |                            |                                                                                                 |
+| 7      | Transformer Model (Swine) |               |             |                            |                                                                                                 |
+| 8      | VGG19              |                       |             |                            |                                                                                                 |
 
 ---
 
-## 📈 Comparison Chart
-| Sr. No | Model Name    | Accuracy  | Precision | Recall    | F1 Score  |
-|--------|---------------|-----------|-----------|-----------|-----------|
-| 1      | VGG16         | 0.9440    | 0.9517    | 0.9440    | 0.9421    |
-| 2      | Inception V3  | 0.9695    | 0.9882    | 0.9855    | 0.9851    |
-| 3      | Custom CNN    | In Progress | In Progress | In Progress | In Progress |
+## 📊 Comparison Chart
+
+| Sr. No | Model Name          | Accuracy | Precision | Recall    | F1 Score  |
+|--------|---------------------|----------|-----------|-----------|-----------|
+| 1      | VGG16              | 0.9440   | 0.9517    | 0.9440    | 0.9421    |
+| 2      | Inception V3       | 0.9695   | 0.9882    | 0.9855    | 0.9851    |
+| 3      | Xception           | 0.9900   | 0.9900    | 0.9900    | 0.9900    |
+| 4      | EfficientNet       | 0.9710   | 0.9772    | 0.9635    | 0.9703    |
+| 5      | Custom CNN         |          |           |           |           |
+| 6      | ResNet             |          |           |           |           |
+| 7      | Transformer Model (Swine) |   |           |           |           |
+| 8      | VGG19              |          |           |           |           |
+
 
 ---
 
