@@ -1,6 +1,6 @@
 # 🕊️ Bird Species Classification Project
 
-##  Project Overview
+# Project Overview
 This project aims to classify bird species using deep learning techniques. Our dataset includes 400 bird species with separate training, validation, and test sets. We are implementing and comparing various models to achieve the best classification performance.
 
 ## 📝 Current Status
@@ -8,23 +8,31 @@ This project aims to classify bird species using deep learning techniques. Our d
 1. **VGG16 (With Augmentation) - by Karitkey**
 2. **Inception V3 - by Kartikey**
 3. **Xception - by Kartikey**
-4. **EffeceientNet B0 - By Akshay**
+4. **EfficientNet B0 - By Akshay**
+5. **VGG19 - By Sridhar Sir**
 
 ### Models Currently in Progress
-5. **Custom CNN - Akshay**
-6. **ResNet 50 - Sridhar Sir**
+6. **Custom CNN - Akshay**
+7. **ResNet 50 - Sridhar Sir**
 
 ### Remaining Models to Implement
-7. Transformer Model (Swine)
-8. VGG19 - Sridhar Sir
+8. Transformer Model (Swine)
 
-If any issues, we can try extra
+If any issues, we can try extra:
 
-10. CNN without Augmentation
+10. CNN without Augmentation  
 11. VGG16 without Augmentation
+
+## ✅ Important Checklist
+- [ ] Upload the trained model files to GitHub.
+- [ ] Create a `predict` function that allows users to select a model from available options.
+- [ ] Ensure that corresponding predictions, statistics, and charts are displayed as output.
+- [ ] Create frontend on streamlit
+- [ ] Start with research paper documentation.
 
 ## Results Update  
 After training the model, update the results in [this Google Doc](https://docs.google.com/document/d/1IUdKqsk9g5wEijbWiCzT49-3nQKj0M20Q0oy7t6vYPU/edit?tab=t.0).
+
 
 
 ---
@@ -59,9 +67,9 @@ After training the model, update the results in [this Google Doc](https://docs.g
 | 3      | Xception           | ~22.9M               | 224 x 224   | ~4 hours (50 epochs)       | Rotation (20°), width & height shift (0.2), horizontal flip                                   |
 | 4      | EfficientNet B0    | ~5.3M                | 299 x 299   | ~3.6 hours (10 epochs)     | Rescale, rotation range (20°), width shift (0.3), height shift (0.3), horizontal flip, vertical flip, zoom range (0.3), shear range (0.3), brightness range ([0.8, 1.2]), fill mode ('nearest') |
 | 5      | Custom CNN         | ~14.5M               | 256 x 256   |                            | Rotation, width and height shifts, shear, zoom, horizontal flip, brightness adjustment, and nearest neighbor fill mode |
-| 6      | ResNet 50          |                       |             |                            |                                                                                                 |
+| 6      | ResNet 50          |                      |             |                            |                                                                                                 |
 | 7      | Transformer Model (Swine) |               |             |                            |                                                                                                 |
-| 8      | VGG19              |                       |             |                            |                                                                                                 |
+| 8      | VGG19              | ~20.9M               | 224 x 224   | ~6 hours (30 epochs, ~720s/epoch)| Rotation (30°), width/height shift (0.2), horizontal flip, vertical flip, zoom range (0.2), shear range (0.2), brightness range (0.8-1.2), nearest neighbor fill mode |
 
 ---
 
@@ -76,7 +84,7 @@ After training the model, update the results in [this Google Doc](https://docs.g
 | 5      | Custom CNN         |          |           |           |           |
 | 6      | ResNet             |          |           |           |           |
 | 7      | Transformer Model (Swine) |   |           |           |           |
-| 8      | VGG19              |          |           |           |           |
+| 8      | VGG19              | 0.9905   | 0.9673    | 0.825     | 0.8935    |
 
 
 ---
