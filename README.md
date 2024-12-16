@@ -84,7 +84,7 @@ After training the model, update the results in [this Google Doc](https://docs.g
 | 5      | Custom CNN         |          |           |           |           |
 | 6      | ResNet             |          |           |           |           |
 | 7      | Transformer Model (Swine) |   |           |           |           |
-| 8      | VGG19              | 0.9905   | 0.9673    | 0.825     | 0.8935    |
+| 8      | VGG19              | 0.9005   | 0.9673    | 0.825     | 0.8923    |
 
 
 ---
