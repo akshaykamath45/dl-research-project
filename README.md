@@ -44,7 +44,8 @@ This project aims to classify bird species using deep learning techniques. Our d
 - [ ] Start with research paper documentation.
 
 ## Results Update  
-After training the model, update the results in [this Google Doc](https://docs.google.com/document/d/1IUdKqsk9g5wEijbWiCzT49-3nQKj0M20Q0oy7t6vYPU/edit?tab=t.0).
+- After training the model, update the results in [this Google Doc](https://docs.google.com/document/d/1IUdKqsk9g5wEijbWiCzT49-3nQKj0M20Q0oy7t6vYPU/edit?tab=t.0).
+- Upload the trained model files (.h5/.pth) over [here](https://drive.google.com/drive/folders/1jjB9ASm4uOFqP6APKGtxZtFJ380_eRde )
 
 
 
