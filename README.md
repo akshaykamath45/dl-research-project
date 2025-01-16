@@ -5,17 +5,23 @@ This project aims to classify bird species using deep learning techniques. Our d
 
 ## 📝 Current Status
 
-### Revised Completed Models with Standardised Epochs and Augmentation
-1. **Xception - by Karitkey**
-2. **VGG19 - by Sridhar Sir**
-3. **Custom CNN - by Sridhar Sir (needs to be revised)**
+## Completed Models with Standardised Epochs and Augmentation
 
+| Model            | Completed By       | Soft Deadline | Hard Deadline |
+|-------------------|--------------------|---------------|---------------|
+| Inception        | Kartikey           | Completed      | Completed     |
+| Custom CNN       | Sridhar Sir        | Completed      | Completed     |
 
-### Models Currently in Progress
-4. **Inception - by Kartikey**
-5. **EfficientNet B0 - By Akshay**
-6. **ResNet - By Sridhar Sir**
-7. **VGG16 - By Akshay**
+## Models Currently in Progress and To Be Completed
+
+| Model            | Completed By       | Soft Deadline  | Hard Deadline  |
+|-------------------|--------------------|----------------|----------------|
+| Xception         | Kartikey           | 17th Jan       | 20th Jan       |
+| EfficientNet B0  | Akshay             | 17th Jan       | 20th Jan       |
+| VGG19            | Akshay             | 19th Jan       | 20th Jan       |
+| Swin Transformer | Kartikey           | 19th Jan       | 20th Jan       |
+| VGG16 (Revised)  | Sridhar Sir        | 18th Jan       | 20th Jan       |
+
 
 
 
@@ -27,9 +33,7 @@ This project aims to classify bird species using deep learning techniques. Our d
 5. **VGG19 - By Sridhar Sir**
 6. **Custom CNN - Sridhar Sir**
 
-### Remaining Models to Implement 
-7. ResNet 50 - Sridhar Sir
-8. Transformer Model (Swine) - Akshay
+
 
 
 ## ✅ Important Checklist
@@ -46,24 +50,63 @@ After training the model, update the results in [this Google Doc](https://docs.g
 
 ---
 
-## 🛠️ How to Train a New Model
-### Step 1: Use Existing Code as Reference
-- Refer to the implementation of **VGG16** or **Inception V3** in the repository.
-- Adjust the model architecture and hyperparameters based on the model to be implemented.
+## ⚒️ How to Train a New Model
 
-### Step 2: Get Assistance
-- Use prompts in tools like Claude or GPT with the existing code snippets to guide you.
-- Ask for guidance on architecture or augmentation tweaks.
+This guide provides a standardized approach for training models in the repository, using Inception V3 in PyTorch as a reference. Follow these steps:
 
-### Step 3: Modify Augmentations/Parameters
-- Experiment with augmentation techniques, learning rates, and optimizers as necessary.
-- Feel free to fine-tune the parameters for optimal performance.
+### Step 1: Code Structure Overview
+1. Ensure your code structure mirrors the `final_code/inceptionv3` folder.
+2. Incorporate essential components:
+   - **Model Definition**: Adapt the classifier layer for your dataset.
+   - **Data Augmentation and Loading**: Leverage standardized preprocessing and augmentations.
+   - **Metrics and Logging**: Track key metrics like accuracy, loss, precision, and recall.
+
+### Step 2: Implement Your Model
+1. Customize the model architecture as required.
+2. Enable training for specific layers by setting `requires_grad=True`.
+
+### Step 3: Prepare Data
+1. Organize datasets into `train`, `valid`, and `test` directories.
+2. Load data using appropriate methods for image datasets.
+3. Apply a consistent augmentation pipeline during preprocessing.
 
 ### Step 4: Train the Model
-- Use **Kaggle Notebooks** for training:
-  1. Visit [this private dataset link](https://www.kaggle.com/datasets/5bc6d82a2bd2ac97d7362a0f2e8b3a19e4ff882b6c112fef14f2de1d82b5c1fe).
-  2. Click **Create Notebook**.
-  3. Add the required dependencies and start training.
+1. Load any pre-existing training states.
+2. Configure hyperparameters, optimizer, and learning rate scheduler.
+3. Train the model and save periodic checkpoints.
+
+### Step 5: Evaluate the Model
+1. Use the best checkpoint to evaluate model performance.
+2. Generate detailed evaluation metrics and visualizations.
+
+### Step 6: Save and Log Results
+1. Save key outputs such as metrics, logs, and plots.
+2. Document hyperparameters to ensure reproducibility.
+
+### Notes for New Models
+- Maintain the same structure across projects for consistency.
+- Use a validation set to monitor training progress.
+- Update class mappings if the dataset contains new classes.
+
+---
+
+### Code References
+
+#### Training Epochs
+- Default training duration is 100 epochs using a standardized `train_model` function.
+
+#### Data Augmentation Pipeline
+```python
+train_transform = transforms.Compose([
+    transforms.Resize((299, 299)),
+    transforms.RandomRotation(20),
+    transforms.RandomHorizontalFlip(),
+    transforms.RandomAffine(0, translate=(0.1, 0.1), scale=(0.9, 1.1)),
+    transforms.ColorJitter(brightness=0.15, contrast=0.15, saturation=0.15, hue=0.05),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+])
+```
 
 ---
 
@@ -76,9 +119,8 @@ After training the model, update the results in [this Google Doc](https://docs.g
 | 3      | Xception           | ~22.9M               | 224 x 224   | ~4 hours (50 epochs)       | Rotation (20°), width & height shift (0.2), horizontal flip                                   |
 | 4      | EfficientNet B0    | ~5.3M                | 299 x 299   | ~3.6 hours (10 epochs)     | Rescale, rotation range (20°), width shift (0.3), height shift (0.3), horizontal flip, vertical flip, zoom range (0.3), shear range (0.3), brightness range ([0.8, 1.2]), fill mode ('nearest') |
 | 5      | Custom CNN         | ~14.5M               | 256 x 256   |                            | Rotation, width and height shifts, shear, zoom, horizontal flip, brightness adjustment, and nearest neighbor fill mode |
-| 6      | ResNet 50          |                      |             |                            |                                                                                                 |
-| 7      | Transformer Model (Swine) |               |             |                            |                                                                                                 |
-| 8      | VGG19              | ~20.9M               | 224 x 224   | ~6 hours (30 epochs, ~720s/epoch)| Rotation (30°), width/height shift (0.2), horizontal flip, vertical flip, zoom range (0.2), shear range (0.2), brightness range (0.8-1.2), nearest neighbor fill mode |
+| 6      | Transformer Model (Swine) |               |             |                            |                                                                                                 |
+| 7     | VGG19              | ~20.9M               | 224 x 224   | ~6 hours (30 epochs, ~720s/epoch)| Rotation (30°), width/height shift (0.2), horizontal flip, vertical flip, zoom range (0.2), shear range (0.2), brightness range (0.8-1.2), nearest neighbor fill mode |
 
 ---
 
@@ -91,9 +133,8 @@ After training the model, update the results in [this Google Doc](https://docs.g
 | 3      | Xception           | 0.9900   | 0.9900    | 0.9900    | 0.9900    |
 | 4      | EfficientNet       | 0.9710   | 0.9772    | 0.9635    | 0.9703    |
 | 5      | Custom CNN         |          |           |           |           |
-| 6      | ResNet             |          |           |           |           |
-| 7      | Transformer Model (Swine) |   |           |           |           |
-| 8      | VGG19              | 0.9005   | 0.9673    | 0.825     | 0.8923    |
+| 6      | Transformer Model (Swine) |   |           |           |           |
+| 7      | VGG19              | 0.9005   | 0.9673    | 0.825     | 0.8923    |
 
 
 ---
