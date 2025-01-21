@@ -7,41 +7,25 @@ This project aims to classify bird species using deep learning techniques. Our d
 
 ## Completed Models with Standardised Epochs and Augmentation
 
-| Model            | Completed By       | Soft Deadline | Hard Deadline |
-|-------------------|--------------------|---------------|---------------|
-| Inception        | Kartikey           | Completed      | Completed     |
-| Custom CNN       | Sridhar Sir        | Completed      | Completed     |
-
-## Models Currently in Progress and To Be Completed
-
-| Model            | Completed By       | Soft Deadline  | Hard Deadline  |
-|-------------------|--------------------|----------------|----------------|
-| Xception         | Kartikey           | 17th Jan       | 20th Jan       |
-| EfficientNet B0  | Akshay             | 17th Jan       | 20th Jan       |
-| VGG19            | Akshay             | 19th Jan       | 20th Jan       |
-| Swin Transformer | Kartikey           | 19th Jan       | 20th Jan       |
-| VGG16 (Revised)  | Sridhar Sir        | 18th Jan       | 20th Jan       |
-
-
-
-
-### Completed Models Earlier
-1. **VGG16 (With Augmentation) - by Karitkey**
-2. **Inception V3 - by Kartikey**
-3. **Xception - by Kartikey**
-4. **EfficientNet B0 - By Akshay**
-5. **VGG19 - By Sridhar Sir**
-6. **Custom CNN - Sridhar Sir**
+### Completed Models
+1. **Swin Transformer**
+2. **Inception V3**
+3. **Xception**
+4. **EfficientNet B0**
+5. **VGG19**
+6. **Custom CNN**
+7. **VGG16**
 
 
 
 
 ## ✅ Important Checklist
-- [ ] Upload the trained model files to GitHub.
-- [ ] Create a `predict` function that allows users to select a model from available options.
-- [ ] Ensure that corresponding predictions, statistics, and charts are displayed as output.
-- [ ] Create frontend on streamlit
+- [x] Upload the trained model files to GitHub.
+- [x] Create a `predict` function that allows users to select a model from available options.
+- [x] Ensure that corresponding predictions, statistics, and charts are displayed as output.
+- [x] Create frontend on streamlit
 - [ ] Start with research paper documentation.
+
 
 ## Results Update  
 - After training the model, update the results in [this Google Doc](https://docs.google.com/document/d/1IUdKqsk9g5wEijbWiCzT49-3nQKj0M20Q0oy7t6vYPU/edit?tab=t.0).
