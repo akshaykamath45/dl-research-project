@@ -60,14 +60,20 @@ def load_class_mapping(model_name):
             return {i: name for i, name in enumerate(class_names)}
         except FileNotFoundError:
             # Fallback to generic class names if file not found
-            return {i: f"Bird Species {i+1}" for i in range(400)}
+            return {str(i): f"Bird Species {i+1}" for i in range(400)}
     else:
+        # For PyTorch models, load from their respective results folders
+        mapping_path = os.path.join('final code', model_name, 'results', 'class_mapping.json')
         try:
-            mapping_path = os.path.join('final code', MODEL_MAPPING[model_name], 'results', 'class_mapping.json')
             with open(mapping_path, 'r') as f:
-                return json.load(f)
+                mapping = json.load(f)
+                # Convert keys to strings to ensure consistent key types
+                return {str(k): v for k, v in mapping.items()}
         except FileNotFoundError:
-            st.error(f"Class mapping file not found for {model_name}")
+            st.error(f"Class mapping file not found: {mapping_path}")
+            return None
+        except Exception as e:
+            st.error(f"Error loading class mapping: {str(e)}")
             return None
 
 # Model name mapping
