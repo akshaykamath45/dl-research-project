@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 import torch.nn as nn
+import tensorflow as tf
 
 # Set page config
 st.set_page_config(page_title="Bird Species Classification", layout="wide")
@@ -53,16 +54,20 @@ st.markdown("""
 @st.cache_resource
 def load_class_mapping(model_name):
     if model_name == 'vgg19':
-        # For VGG19, create a mapping of 400 classes (0-399)
-        return {str(i): f"Class_{i}" for i in range(400)}
-    else:
-        # For PyTorch models, load from their respective results folders
-        mapping_path = os.path.join('final code', model_name, 'results', 'class_mapping.json')
         try:
+            with open(os.path.join('final code', 'vgg19', 'class_names.txt'), 'r') as f:
+                class_names = [line.strip() for line in f.readlines()]
+            return {i: name for i, name in enumerate(class_names)}
+        except FileNotFoundError:
+            # Fallback to generic class names if file not found
+            return {i: f"Bird Species {i+1}" for i in range(400)}
+    else:
+        try:
+            mapping_path = os.path.join('final code', MODEL_MAPPING[model_name], 'results', 'class_mapping.json')
             with open(mapping_path, 'r') as f:
                 return json.load(f)
         except FileNotFoundError:
-            st.error(f"Class mapping file not found for {model_name}. Please check the path: {mapping_path}")
+            st.error(f"Class mapping file not found for {model_name}")
             return None
 
 # Model name mapping
@@ -257,9 +262,13 @@ def transform_image_pytorch(image, model_name):
     return transform(image)
 
 def transform_image_tensorflow(image):
+    # Resize to VGG19 input size
     image = image.resize((224, 224))
-    image = np.array(image) / 255.0
-    return np.expand_dims(image, axis=0)
+    # Convert to numpy array and preprocess
+    img_array = np.array(image)
+    # Add batch dimension and preprocess using VGG19 preprocessing
+    img_array = tf.keras.applications.vgg19.preprocess_input(img_array)
+    return np.expand_dims(img_array, axis=0)
 
 # Prediction function
 def predict_image(model, image, model_type, model_name):
@@ -280,7 +289,7 @@ def predict_image(model, image, model_type, model_name):
 def plot_confidence_distribution(predictions, class_names, top_k=5):
     top_k_idx = np.argsort(predictions)[-top_k:][::-1]
     top_k_values = predictions[top_k_idx]
-    top_k_classes = [class_names[str(idx)] for idx in top_k_idx]
+    top_k_classes = [class_names[idx] for idx in top_k_idx]
     
     fig, ax = plt.subplots(figsize=(10, 5))
     bars = ax.bar(top_k_classes, top_k_values)
@@ -355,7 +364,7 @@ def main():
                         
                         # Get top prediction
                         top_pred_idx = np.argmax(predictions)
-                        top_pred_class = class_mapping[str(top_pred_idx)]
+                        top_pred_class = class_mapping[top_pred_idx]
                         top_pred_conf = predictions[top_pred_idx]
                         
                         # Display top prediction with confidence
