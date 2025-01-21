@@ -165,6 +165,39 @@ class XceptionClassifier(nn.Module):
     def forward(self, x):
         return self.xception(x)
 
+class SwinClassifier(nn.Module):
+    def __init__(self, num_classes):
+        super(SwinClassifier, self).__init__()
+        self.swin = models.swin_b(weights='DEFAULT')
+        
+        # Freeze all parameters initially
+        for param in self.swin.parameters():
+            param.requires_grad = False
+            
+        # Unfreeze the last two stages
+        for layer in [self.swin.features[-1], self.swin.features[-2]]:
+            for param in layer.parameters():
+                param.requires_grad = True
+        
+        # Get the number of features from the last layer
+        num_features = self.swin.head.in_features
+        
+        # Replace the classification head with improved architecture
+        self.swin.head = nn.Sequential(
+            nn.Linear(num_features, 1536),
+            nn.BatchNorm1d(1536),
+            nn.ReLU(),
+            nn.Dropout(0.3),
+            nn.Linear(1536, 1024),
+            nn.BatchNorm1d(1024),
+            nn.ReLU(),
+            nn.Dropout(0.3),
+            nn.Linear(1024, num_classes)
+        )
+        
+    def forward(self, x):
+        return self.swin(x)
+
 # Define model loading functions for PyTorch models
 @st.cache_resource
 def load_pytorch_model(model_name):
@@ -172,7 +205,8 @@ def load_pytorch_model(model_name):
         model = BirdClassifier(num_classes=400)
         model.eval()  # Set to evaluation mode
     elif model_name == 'swin_b':
-        model = models.swin_b(pretrained=False)
+        model = SwinClassifier(num_classes=400)
+        model.eval()  # Set to evaluation mode
     elif model_name == 'xception':
         model = XceptionClassifier(num_classes=400)
         model.eval()  # Set to evaluation mode
