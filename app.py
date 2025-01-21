@@ -54,13 +54,8 @@ st.markdown("""
 @st.cache_resource
 def load_class_mapping(model_name):
     if model_name == 'vgg19':
-        try:
-            with open(os.path.join('final code', 'vgg19', 'class_names.txt'), 'r') as f:
-                class_names = [line.strip() for line in f.readlines()]
-            return {i: name for i, name in enumerate(class_names)}
-        except FileNotFoundError:
-            # Fallback to generic class names if file not found
-            return {str(i): f"Bird Species {i+1}" for i in range(400)}
+        # For VGG19, create a mapping of 400 classes (0-399)
+        return {str(i): f"Bird Species {i+1}" for i in range(400)}
     else:
         # For PyTorch models, load from their respective results folders
         mapping_path = os.path.join('final code', model_name, 'results', 'class_mapping.json')
@@ -295,7 +290,7 @@ def predict_image(model, image, model_type, model_name):
 def plot_confidence_distribution(predictions, class_names, top_k=5):
     top_k_idx = np.argsort(predictions)[-top_k:][::-1]
     top_k_values = [float(predictions[idx]) for idx in top_k_idx]  # Convert to Python float
-    top_k_classes = [class_names[str(int(idx))] for idx in top_k_idx]  # Convert indices to string
+    top_k_classes = [class_names[str(int(idx))] for idx in top_k_idx]  # Convert indices to string for mapping
     
     fig, ax = plt.subplots(figsize=(10, 5))
     bars = ax.bar(top_k_classes, top_k_values)
