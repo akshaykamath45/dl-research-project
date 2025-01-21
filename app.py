@@ -288,8 +288,8 @@ def predict_image(model, image, model_type, model_name):
 # Plot confidence distribution
 def plot_confidence_distribution(predictions, class_names, top_k=5):
     top_k_idx = np.argsort(predictions)[-top_k:][::-1]
-    top_k_values = predictions[top_k_idx]
-    top_k_classes = [class_names[idx] for idx in top_k_idx]
+    top_k_values = [float(predictions[idx]) for idx in top_k_idx]  # Convert to Python float
+    top_k_classes = [class_names[str(int(idx))] for idx in top_k_idx]  # Convert indices to string
     
     fig, ax = plt.subplots(figsize=(10, 5))
     bars = ax.bar(top_k_classes, top_k_values)
@@ -363,9 +363,9 @@ def main():
                         st.subheader("Prediction Results")
                         
                         # Get top prediction
-                        top_pred_idx = np.argmax(predictions)
-                        top_pred_class = class_mapping[top_pred_idx]
-                        top_pred_conf = predictions[top_pred_idx]
+                        top_pred_idx = int(np.argmax(predictions))  # Convert to Python int
+                        top_pred_class = class_mapping[str(top_pred_idx)]  # Convert to string for JSON mapping
+                        top_pred_conf = float(predictions[top_pred_idx])  # Convert to Python float
                         
                         # Display top prediction with confidence
                         st.markdown(f"""
