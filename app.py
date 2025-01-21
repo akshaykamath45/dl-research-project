@@ -139,6 +139,32 @@ class EfficientNetClassifier(nn.Module):
     def forward(self, x):
         return self.efficientnet(x)
 
+class XceptionClassifier(nn.Module):
+    def __init__(self, num_classes):
+        super(XceptionClassifier, self).__init__()
+        self.xception = timm.create_model('xception', pretrained=True)
+        
+        # Freeze all layers
+        for param in self.xception.parameters():
+            param.requires_grad = False
+            
+        # Replace classifier with custom architecture
+        num_features = self.xception.fc.in_features  # This is 2048 for Xception
+        self.xception.fc = nn.Sequential(
+            nn.Linear(num_features, 1536),
+            nn.BatchNorm1d(1536),
+            nn.ReLU(),
+            nn.Dropout(0.3),
+            nn.Linear(1536, 1024),
+            nn.BatchNorm1d(1024),
+            nn.ReLU(),
+            nn.Dropout(0.3),
+            nn.Linear(1024, 400)  # 400 classes
+        )
+        
+    def forward(self, x):
+        return self.xception(x)
+
 # Define model loading functions for PyTorch models
 @st.cache_resource
 def load_pytorch_model(model_name):
@@ -148,7 +174,8 @@ def load_pytorch_model(model_name):
     elif model_name == 'swin_b':
         model = models.swin_b(pretrained=False)
     elif model_name == 'xception':
-        model = timm.create_model('xception', pretrained=False)
+        model = XceptionClassifier(num_classes=400)
+        model.eval()  # Set to evaluation mode
     elif model_name == 'efficientnet_b0':
         model = EfficientNetClassifier(num_classes=400)
         model.eval()  # Set to evaluation mode
