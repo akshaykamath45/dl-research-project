@@ -1,0 +1,5 @@
+{
+    "global_epoch": 40,
+    "best_val_accuracy": 0.986,
+    "model_path": "/kaggle/working/best_model.pth"
+}

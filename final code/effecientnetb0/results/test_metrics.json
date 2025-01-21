@@ -1,0 +1,6 @@
+{
+    "test_loss": 0.04489508468014676,
+    "test_accuracy": 0.9865,
+    "test_precision": 0.9885148809523809,
+    "test_recall": 0.9865
+}
