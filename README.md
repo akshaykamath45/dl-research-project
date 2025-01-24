@@ -14,7 +14,7 @@ This project aims to classify bird species using deep learning techniques. Our d
 4. **EfficientNet B0**
 5. **VGG19**
 6. **Custom CNN**
-7. **VGG16**
+7. **GoogLeNet**
 
 
 
