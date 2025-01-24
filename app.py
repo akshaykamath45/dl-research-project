@@ -77,7 +77,8 @@ MODEL_MAPPING = {
     'swin_b': 'swin_b',
     'xception': 'xception',
     'efficientnet_b0': 'efficientnetb0',
-    'vgg19': 'vgg19'
+    'vgg19': 'vgg19',
+    'googlenet': 'googlenet'
 }
 
 # Model filename mapping
@@ -86,7 +87,8 @@ MODEL_FILE_MAPPING = {
     'swin_b': 'swin.pth',
     'xception': 'xception.pth',
     'efficientnet_b0': 'effecientnet.pth',
-    'vgg19': 'vgg19.h5'
+    'vgg19': 'vgg19.h5',
+    'googlenet': 'googlenet.pth'
 }
 
 class BirdClassifier(nn.Module):
@@ -126,20 +128,26 @@ class BirdClassifier(nn.Module):
 class EfficientNetClassifier(nn.Module):
     def __init__(self, num_classes):
         super(EfficientNetClassifier, self).__init__()
-        self.efficientnet = models.efficientnet_b0(weights='DEFAULT')
+        # Initialize without pre-trained weights
+        self.efficientnet = models.efficientnet_b0(weights=None)
         
-        # Freeze all layers
+        # Freeze early layers
         for param in self.efficientnet.parameters():
             param.requires_grad = False
             
-        # Replace classifier with custom architecture
-        num_features = self.efficientnet.classifier[1].in_features  # This is 1280 for efficientnet_b0
+        # Unfreeze the last few layers
+        for layer in [self.efficientnet.features[-1], self.efficientnet.classifier]:
+            for param in layer.parameters():
+                param.requires_grad = True
+            
+        # Replace the final layer with improved architecture
+        num_features = self.efficientnet.classifier[1].in_features
         self.efficientnet.classifier = nn.Sequential(
             nn.Linear(num_features, 1024),
             nn.BatchNorm1d(1024),
             nn.ReLU(),
-            nn.Dropout(0.3),
-            nn.Linear(1024, 400)  # Direct connection to output
+            nn.Dropout(0.4),
+            nn.Linear(1024, num_classes)
         )
         
     def forward(self, x):
@@ -204,27 +212,65 @@ class SwinClassifier(nn.Module):
     def forward(self, x):
         return self.swin(x)
 
+class GoogLeNetBirdClassifier(nn.Module):
+    def __init__(self, num_classes):
+        super(GoogLeNetBirdClassifier, self).__init__()
+        self.googlenet = models.googlenet(weights='DEFAULT')
+        
+        # Freeze all parameters initially
+        for param in self.googlenet.parameters():
+            param.requires_grad = False
+            
+        # Unfreeze the last inception blocks (a3, b3)
+        layers_to_unfreeze = ['inception5a', 'inception5b']
+        for name, param in self.googlenet.named_parameters():
+            if any(layer in name for layer in layers_to_unfreeze):
+                param.requires_grad = True
+        
+        # Modified classifier head
+        num_features = self.googlenet.fc.in_features
+        self.googlenet.fc = nn.Sequential(
+            nn.Linear(num_features, 1024),
+            nn.BatchNorm1d(1024),
+            nn.ReLU(),
+            nn.Dropout(0.4),
+            nn.Linear(1024, 512),
+            nn.BatchNorm1d(512),
+            nn.ReLU(),
+            nn.Dropout(0.4),
+            nn.Linear(512, num_classes)
+        )
+        
+    def forward(self, x):
+        return self.googlenet(x)
+
 # Define model loading functions for PyTorch models
 @st.cache_resource
 def load_pytorch_model(model_name):
     if model_name == 'inceptionv3':
         model = BirdClassifier(num_classes=400)
-        model.eval()  # Set to evaluation mode
     elif model_name == 'swin_b':
         model = SwinClassifier(num_classes=400)
-        model.eval()  # Set to evaluation mode
     elif model_name == 'xception':
         model = XceptionClassifier(num_classes=400)
-        model.eval()  # Set to evaluation mode
     elif model_name == 'efficientnet_b0':
         model = EfficientNetClassifier(num_classes=400)
-        model.eval()  # Set to evaluation mode
+    elif model_name == 'googlenet':
+        model = GoogLeNetBirdClassifier(num_classes=400)
     
     # Load the trained weights using the correct filename
     model_path = os.path.join('trained models', MODEL_FILE_MAPPING[model_name])
     try:
-        model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
-        model.eval()
+        # Load state dict with map_location and weights_only=True
+        state_dict = torch.load(model_path, map_location=torch.device('cpu'), weights_only=True)
+        
+        # Handle potential DataParallel wrapper
+        if any(k.startswith('module.') for k in state_dict.keys()):
+            state_dict = {k.replace('module.', ''): v for k, v in state_dict.items()}
+        
+        # Load state dict
+        model.load_state_dict(state_dict, strict=False)
+        model.eval()  # Set to evaluation mode
         return model
     except FileNotFoundError:
         st.error(f"Model file not found: {model_path}")
@@ -238,20 +284,43 @@ def load_pytorch_model(model_name):
 def load_tensorflow_model():
     model_path = os.path.join('trained models', MODEL_FILE_MAPPING['vgg19'])
     try:
-        return load_model(model_path)
+        # Custom load function for VGG19
+        base_model = tf.keras.applications.VGG19(
+            weights='imagenet',
+            include_top=False,
+            input_shape=(224, 224, 3)
+        )
+        
+        # Create the model architecture
+        x = base_model.output
+        x = tf.keras.layers.GlobalAveragePooling2D()(x)
+        x = tf.keras.layers.Dense(1024, activation='relu')(x)
+        x = tf.keras.layers.Dropout(0.5)(x)
+        x = tf.keras.layers.Dense(512, activation='relu')(x)
+        x = tf.keras.layers.Dropout(0.4)(x)
+        predictions = tf.keras.layers.Dense(400, activation='softmax')(x)
+        
+        model = tf.keras.Model(inputs=base_model.input, outputs=predictions)
+        
+        # Load weights
+        model.load_weights(model_path)
+        return model
     except FileNotFoundError:
         st.error(f"Model file not found: {model_path}")
+        return None
+    except Exception as e:
+        st.error(f"Error loading model: {str(e)}")
         return None
 
 # Image transformation functions
 def transform_image_pytorch(image, model_name):
     if model_name == 'inceptionv3':
         size = 299
-    elif model_name == 'swin_b':
+    elif model_name in ['swin_b', 'efficientnet_b0', 'googlenet']:
         size = 224
     elif model_name == 'xception':
         size = 299
-    else:  # efficientnet
+    else:  # default
         size = 224
         
     transform = transforms.Compose([
