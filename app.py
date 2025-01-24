@@ -53,8 +53,8 @@ st.markdown("""
 # Load class names based on model
 @st.cache_resource
 def load_class_mapping(model_name):
-    if model_name == 'vgg19':
-        # For VGG19, create a mapping of 400 classes (0-399)
+    if model_name in ['vgg19', 'customcnn']:  # Add customcnn to use the same mapping as VGG19
+        # For VGG19 and CustomCNN, create a mapping of 400 classes (0-399)
         return {str(i): f"Bird Species {i+1}" for i in range(400)}
     else:
         # For PyTorch models, load from their respective results folders
@@ -78,7 +78,8 @@ MODEL_MAPPING = {
     'xception': 'xception',
     'efficientnet_b0': 'efficientnetb0',
     'vgg19': 'vgg19',
-    'googlenet': 'googlenet'
+    'googlenet': 'googlenet',
+    'customcnn': 'customcnn'  # Add custom CNN model
 }
 
 # Model filename mapping
@@ -88,7 +89,8 @@ MODEL_FILE_MAPPING = {
     'xception': 'xception.pth',
     'efficientnet_b0': 'effecientnet.pth',
     'vgg19': 'vgg19.h5',
-    'googlenet': 'googlenet.pth'
+    'googlenet': 'googlenet.pth',
+    'customcnn': 'customcnn.h5'  # Add custom CNN model file
 }
 
 class BirdClassifier(nn.Module):
@@ -279,39 +281,6 @@ def load_pytorch_model(model_name):
         st.error(f"Error loading model: {str(e)}")
         return None
 
-# Load TensorFlow model
-@st.cache_resource
-def load_tensorflow_model():
-    model_path = os.path.join('trained models', MODEL_FILE_MAPPING['vgg19'])
-    try:
-        # Custom load function for VGG19
-        base_model = tf.keras.applications.VGG19(
-            weights='imagenet',
-            include_top=False,
-            input_shape=(224, 224, 3)
-        )
-        
-        # Create the model architecture
-        x = base_model.output
-        x = tf.keras.layers.GlobalAveragePooling2D()(x)
-        x = tf.keras.layers.Dense(1024, activation='relu')(x)
-        x = tf.keras.layers.Dropout(0.5)(x)
-        x = tf.keras.layers.Dense(512, activation='relu')(x)
-        x = tf.keras.layers.Dropout(0.4)(x)
-        predictions = tf.keras.layers.Dense(400, activation='softmax')(x)
-        
-        model = tf.keras.Model(inputs=base_model.input, outputs=predictions)
-        
-        # Load weights
-        model.load_weights(model_path)
-        return model
-    except FileNotFoundError:
-        st.error(f"Model file not found: {model_path}")
-        return None
-    except Exception as e:
-        st.error(f"Error loading model: {str(e)}")
-        return None
-
 # Image transformation functions
 def transform_image_pytorch(image, model_name):
     if model_name == 'inceptionv3':
@@ -331,20 +300,26 @@ def transform_image_pytorch(image, model_name):
     ])
     return transform(image)
 
-def transform_image_tensorflow(image):
-    # Resize to VGG19 input size
+def transform_image_tensorflow(image, model_name='vgg19'):
+    # Resize to correct input size
     image = image.resize((224, 224))
     # Convert to numpy array and preprocess
     img_array = np.array(image)
-    # Add batch dimension and preprocess using VGG19 preprocessing
-    img_array = tf.keras.applications.vgg19.preprocess_input(img_array)
+    
+    if model_name == 'vgg19':
+        # VGG19 specific preprocessing
+        img_array = tf.keras.applications.vgg19.preprocess_input(img_array)
+    else:  # Custom CNN preprocessing
+        # Rescale to [0,1] as per the training code
+        img_array = img_array / 255.0
+    
     return np.expand_dims(img_array, axis=0)
 
 # Prediction function
 def predict_image(model, image, model_type, model_name):
     if model_type == 'tensorflow':
-        transformed_image = transform_image_tensorflow(image)
-        predictions = model.predict(transformed_image)
+        transformed_image = transform_image_tensorflow(image, model_name)
+        predictions = model.predict(transformed_image, verbose=0)  # Set verbose=0 to avoid printing prediction messages
         class_probs = predictions[0]
     else:
         transformed_image = transform_image_pytorch(image, model_name)
@@ -415,8 +390,8 @@ def main():
         if st.button("Classify", type="primary"):
             with st.spinner("Processing image..."):
                 try:
-                    if model_choice == 'vgg19':
-                        model = load_tensorflow_model()
+                    if model_choice in ['vgg19', 'customcnn']:  # Add customcnn to use tensorflow loading
+                        model = load_tensorflow_model(model_choice)
                         model_type = 'tensorflow'
                     else:
                         model = load_pytorch_model(model_choice)
@@ -456,12 +431,112 @@ def main():
                         st.info(f"""
                         - Model: {model_choice.upper()}
                         - Type: {'TensorFlow' if model_type == 'tensorflow' else 'PyTorch'}
-                        - Input Size: {224 if model_choice in ['swin_b', 'efficientnet_b0', 'vgg19'] else 299} x {224 if model_choice in ['swin_b', 'efficientnet_b0', 'vgg19'] else 299}
+                        - Input Size: {224 if model_choice in ['swin_b', 'efficientnet_b0', 'vgg19', 'customcnn'] else 299} x {224 if model_choice in ['swin_b', 'efficientnet_b0', 'vgg19', 'customcnn'] else 299}
                         """)
                 
                 except Exception as e:
                     st.error(f"An error occurred: {str(e)}")
                     st.error("Please try again with a different image or model.")
+
+# Load TensorFlow model
+@st.cache_resource
+def load_tensorflow_model(model_name='vgg19'):
+    model_path = os.path.join('trained models', MODEL_FILE_MAPPING[model_name])
+    try:
+        if model_name == 'vgg19':
+            # VGG19 specific loading
+            base_model = tf.keras.applications.VGG19(
+                weights='imagenet',
+                include_top=False,
+                input_shape=(224, 224, 3)
+            )
+            
+            # Create the model architecture
+            x = base_model.output
+            x = tf.keras.layers.GlobalAveragePooling2D()(x)
+            x = tf.keras.layers.Dense(1024, activation='relu')(x)
+            x = tf.keras.layers.Dropout(0.5)(x)
+            x = tf.keras.layers.Dense(512, activation='relu')(x)
+            x = tf.keras.layers.Dropout(0.4)(x)
+            predictions = tf.keras.layers.Dense(400, activation='softmax')(x)
+            
+            model = tf.keras.Model(inputs=base_model.input, outputs=predictions)
+            # Load weights
+            model.load_weights(model_path)
+        else:  # Custom CNN model
+            # Create the custom CNN model architecture
+            model = tf.keras.Sequential([
+                # First Convolutional Block
+                tf.keras.layers.Conv2D(32, (3, 3), activation='relu', input_shape=(224, 224, 3), 
+                                     kernel_initializer='he_normal', padding='same'),
+                tf.keras.layers.BatchNormalization(),
+                tf.keras.layers.MaxPooling2D((2, 2)),
+                tf.keras.layers.Dropout(0.25),
+                
+                # Second Convolutional Block
+                tf.keras.layers.Conv2D(64, (3, 3), activation='relu', 
+                                     kernel_initializer='he_normal', padding='same'),
+                tf.keras.layers.BatchNormalization(),
+                tf.keras.layers.Conv2D(64, (3, 3), activation='relu', 
+                                     kernel_initializer='he_normal', padding='same'),
+                tf.keras.layers.MaxPooling2D((2, 2)),
+                tf.keras.layers.Dropout(0.3),
+                
+                # Third Convolutional Block
+                tf.keras.layers.Conv2D(128, (3, 3), activation='relu', 
+                                     kernel_initializer='he_normal', padding='same'),
+                tf.keras.layers.BatchNormalization(),
+                tf.keras.layers.Conv2D(128, (3, 3), activation='relu', 
+                                     kernel_initializer='he_normal', padding='same'),
+                tf.keras.layers.MaxPooling2D((2, 2)),
+                tf.keras.layers.Dropout(0.35),
+                
+                # Fourth Convolutional Block
+                tf.keras.layers.Conv2D(256, (3, 3), activation='relu', 
+                                     kernel_initializer='he_normal', padding='same'),
+                tf.keras.layers.BatchNormalization(),
+                tf.keras.layers.Conv2D(256, (3, 3), activation='relu', 
+                                     kernel_initializer='he_normal', padding='same'),
+                tf.keras.layers.MaxPooling2D((2, 2)),
+                tf.keras.layers.Dropout(0.4),
+                
+                # Flatten and Fully Connected Layers
+                tf.keras.layers.Flatten(),
+                
+                tf.keras.layers.Dense(512, activation='relu', 
+                                    kernel_initializer='he_normal',
+                                    kernel_regularizer=tf.keras.regularizers.l2(0.0001)),
+                tf.keras.layers.BatchNormalization(),
+                tf.keras.layers.Dropout(0.5),
+                
+                tf.keras.layers.Dense(256, activation='relu', 
+                                    kernel_initializer='he_normal',
+                                    kernel_regularizer=tf.keras.regularizers.l2(0.001)),
+                tf.keras.layers.BatchNormalization(),
+                tf.keras.layers.Dropout(0.4),
+                
+                # Output Layer
+                tf.keras.layers.Dense(400, activation='softmax')
+            ])
+            
+            # Load weights
+            model.load_weights(model_path)
+            
+            # Compile model
+            model.compile(
+                optimizer=tf.keras.optimizers.Adam(learning_rate=0.0001, clipnorm=1.0),
+                loss='categorical_crossentropy',
+                metrics=['accuracy',
+                        tf.keras.metrics.Precision(),
+                        tf.keras.metrics.Recall()]
+            )
+        return model
+    except FileNotFoundError:
+        st.error(f"Model file not found: {model_path}")
+        return None
+    except Exception as e:
+        st.error(f"Error loading model: {str(e)}")
+        return None
 
 if __name__ == "__main__":
     main()
