@@ -32,6 +32,87 @@ This project aims to classify bird species using deep learning techniques. Our d
 - Upload the trained model files (.h5/.pth) over [here](https://drive.google.com/drive/folders/1jjB9ASm4uOFqP6APKGtxZtFJ380_eRde )
 
 
+## 🛠️ Local Setup Instructions
+
+### Method 1: Using Virtual Environment (Recommended)
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/akshaykamath45/dl-research-project.git
+   cd dl-research-project
+   ```
+
+2. **Create and activate virtual environment**
+   ```bash
+   # Windows
+   python -m venv myenv
+   myenv\Scripts\activate
+
+   # Linux/macOS
+   python3 -m venv myenv
+   source myenv/bin/activate
+   ```
+
+3. **Install required packages**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Download model files**
+   - Download the following model files from [Google Drive](https://drive.google.com/drive/folders/1jjB9ASm4uOFqP6APKGtxZtFJ380_eRde):
+     - `customcnn.h5`
+     - `inceptionv3.pth`
+     - `swin.pth`
+   - Place these files in the `trained models` folder of the project
+
+5. **Run the application**
+   ```bash
+   streamlit run app.py
+   ```
+
+### Method 2: Direct Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/akshaykamath45/dl-research-project.git
+   cd dl-research-project
+   ```
+
+2. **Install required packages globally**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Download model files**
+   - Download the following model files from [Google Drive](https://drive.google.com/drive/folders/1jjB9ASm4uOFqP6APKGtxZtFJ380_eRde):
+     - `customcnn.h5`
+     - `inceptionv3.pth`
+     - `swin.pth`
+   - Place these files in the `trained models` folder of the project
+
+4. **Run the application**
+   ```bash
+   streamlit run app.py
+   ```
+
+### Project Structure
+```
+dl-research-project/
+├── trained models/          # Place downloaded model files here
+│   ├── customcnn.h5
+│   ├── inceptionv3.pth
+│   └── swin.pth
+├── app.py                   # Main application file
+├── requirements.txt         # Package dependencies
+└── ...
+```
+
+### Note
+- Make sure you have Python 3.7+ installed on your system
+- The virtual environment method (Method 1) is recommended to avoid package conflicts
+- Some models are too large for GitHub, hence they need to be downloaded separately
+- Ensure all model files are placed in the correct directory before running the application
+
 
 ---
 
@@ -74,6 +155,8 @@ This guide provides a standardized approach for training models in the repositor
 - Update class mappings if the dataset contains new classes.
 
 ---
+
+
 
 ### Code References
 
